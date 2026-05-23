@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:modeler="http://camunda.org/schema/modeler/1.0" xmlns:biodi="http://bpmn.io/schema/dmn/biodi/2.0" id="Definitions_1jgrt38" name="DRD" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="5.47.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.9.0">
+  <decision id="Decision_0rw3x12" name="Decision 1">
+    <decisionTable id="DecisionTable_0gzei57">
+      <input id="Input_1" label="Xác suất rời mạng" biodi:width="192">
+        <inputExpression id="InputExpression_1" typeRef="number">
+          <text>churn_probability</text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_00260aa" label="Phân khúc">
+        <inputExpression id="LiteralExpression_06pcp4h" typeRef="string">
+          <text>ltv_segment</text>
+        </inputExpression>
+      </input>
+      <output id="Output_1" label="Hành động" name="retention_action" typeRef="string" />
+      <rule id="DecisionRule_0jqvrvu">
+        <inputEntry id="UnaryTests_0s9x02c">
+          <text>&gt;= 0.7</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_01plaih">
+          <text>"VIP"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_19d5gof">
+          <text>"Tặng voucher 30% và gọi điện chăm sóc"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1x5nacf">
+        <inputEntry id="UnaryTests_0q5cf5e">
+          <text>&gt;= 0.7</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1qt6dwi">
+          <text>"Standard"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_04mr9lv">
+          <text>"Gửi SMS tặng data 4G"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1f0d55t">
+        <inputEntry id="UnaryTests_1x9sxnu">
+          <text>[0.4..0.7)</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1awf4r8">
+          <text>"VIP"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1f49jou">
+          <text>"Gửi email khảo sát chất lượng"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_16b2bve">
+        <inputEntry id="UnaryTests_0zzy7x2">
+          <text>&lt; 0.4</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0bmg91o">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_07d227m">
+          <text>"Không hành động"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram>
+      <dmndi:DMNShape id="Decision_0rw3x12_di" dmnElementRef="Decision_0rw3x12">
+        <dc:Bounds height="80" width="180" x="160" y="100" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>
