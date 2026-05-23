@@ -13,9 +13,16 @@ In the telecommunications industry, acquiring a new customer is often 5 to 25 ti
 1. **Reactive Approach:** Customer service interventions only occur when the customer has already requested to cancel their subscription, which is often too late.
 2. **Inefficient Budget Allocation:** Distributing promotional vouchers uniformly to all customers—including those with no intention of leaving or those with low profit margins—results in significant marketing budget waste.
 
-## AI Solution
-To address these challenges, this project leverages **Machine Learning** (trained on the Telco Customer Churn dataset) to proactively assess customer health.
-Instead of a simple binary prediction (Churn vs. No Churn), the AI model is calibrated to output a **Churn Probability**. For instance, a customer might have an 85% risk of churning in the upcoming month.
+## Machine Learning Pipeline & AI Solution (`01_Churn_Prediction.ipynb`)
+To address these challenges, this project leverages a comprehensive **Machine Learning Pipeline** to proactively assess customer health. Instead of a simple binary prediction (Churn vs. No Churn), the model is calibrated to output a **Churn Probability**. 
+
+The ML workflow consists of:
+1. **Exploratory Data Analysis (EDA):** Deep dive into the Telco dataset to uncover churn drivers. We visualize the distributions of numerical features (`Tenure`, `MonthlyCharges`, `TotalCharges`) and key categorical services (`Contract`, `InternetService`) to understand the correlation with churn rates.
+2. **Data Preprocessing & Feature Engineering:** 
+   - Handling missing values (e.g., imputing empty `TotalCharges` for new customers).
+   - **Label Encoding** for binary categorical variables (`gender`, `Partner`).
+   - **One-Hot Encoding** for multi-class categorical features (e.g., converting `InternetService` into binary matrix columns).
+3. **Model Training:** We utilize advanced algorithms (like XGBoost/RandomForest) trained on the encoded features. The model leverages `.predict_proba()` to output a continuous risk score (e.g., an 85% risk of churning next month).
 
 By integrating this probability with the **Customer Lifetime Value (LTV)**, the system categorizes customers into distinct segments. This enables the business to identify high-value VIP customers requiring immediate retention efforts versus Standard customers who only need basic engagement.
 
