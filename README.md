@@ -1,4 +1,4 @@
-# AI-Driven Customer Churn Retention & Decision Automation
+# Automated Customer Churn Prevention Engine
 
 ![BPMN Process Diagram](camunda_models/churn_process.png)
 *(Automated Business Process Flow via BPMN)*
@@ -9,56 +9,57 @@
 ---
 
 ## Business Problem
-In the telecommunications industry, acquiring a new customer is often 5 to 25 times more expensive than retaining an existing one. However, businesses typically face two major hurdles:
-1. **Reactive Approach:** Customer service interventions only occur when the customer has already requested to cancel their subscription, which is often too late.
+In the telecommunications industry, acquiring a new customer is significantly more expensive than retaining an existing one. Businesses typically face two major hurdles:
+1. **Reactive Approach:** Customer service interventions often occur only when the customer has already initiated the cancellation process, at which point retention is highly unlikely.
 2. **Inefficient Budget Allocation:** Distributing promotional vouchers uniformly to all customers—including those with no intention of leaving or those with low profit margins—results in significant marketing budget waste.
 
-## Machine Learning Pipeline & AI Solution (`01_Churn_Prediction.ipynb`)
-To address these challenges, this project leverages a comprehensive **Machine Learning Pipeline** to proactively assess customer health. Instead of a simple binary prediction (Churn vs. No Churn), the model is calibrated to output a **Churn Probability**. 
+## Technical Solution & Machine Learning Pipeline
+To address these challenges, this project leverages a comprehensive Machine Learning Pipeline (`01_Churn_Prediction.ipynb`) to proactively assess customer health. Instead of a simple binary prediction, the model is meticulously calibrated to output a continuous **Churn Probability** and operates under strict data science methodologies.
 
-The ML workflow consists of:
-1. **Exploratory Data Analysis (EDA):** Deep dive into the Telco dataset to uncover churn drivers. We visualize the distributions of numerical features (`Tenure`, `MonthlyCharges`, `TotalCharges`) and key categorical services (`Contract`, `InternetService`) to understand the correlation with churn rates.
-2. **Data Preprocessing & Feature Engineering:** 
-   - Handling missing values (e.g., imputing empty `TotalCharges` for new customers).
-   - **Label Encoding** for binary categorical variables (`gender`, `Partner`).
-   - **One-Hot Encoding** for multi-class categorical features (e.g., converting `InternetService` into binary matrix columns).
-3. **Model Training:** We utilize advanced algorithms (like XGBoost/RandomForest) trained on the encoded features. The model leverages `.predict_proba()` to output a continuous risk score (e.g., an 85% risk of churning next month).
-
-By integrating this probability with the **Customer Lifetime Value (LTV)**, the system categorizes customers into distinct segments. This enables the business to identify high-value VIP customers requiring immediate retention efforts versus Standard customers who only need basic engagement.
+### Pipeline Architecture
+1. **Exploratory Data Analysis (EDA):** Deep dive into the Telco dataset to uncover churn drivers, visualizing the distributions of numerical features and key categorical services.
+2. **Feature Engineering & Preprocessing:** 
+   - Imputing missing values using logical business assumptions (e.g., using initial `MonthlyCharges` for missing `TotalCharges`).
+   - Constructing strong behavioral indicators such as `NumServices`, `AutoPay`, and `HighRisk` groupings, moving away from redundant continuous variables.
+   - Employing One-Hot Encoding and rigorous Stratified Data Splitting to maintain population distributions.
+3. **Addressing Class Imbalance:** Rather than relying on default accuracy metrics (which are misleading with imbalanced churn data), the pipeline evaluates three distinct balancing strategies (Baseline, Scale Weighting, and SMOTE) via 5-Fold Cross-Validation, specifically targeting the **F1-Score**.
+4. **Hyperparameter Tuning & Threshold Optimization:**
+   - Hyperparameters are tuned via `RandomizedSearchCV` strictly maximizing the F1-Score.
+   - The decision threshold is mathematically optimized using **Out-Of-Fold (OOF)** predictions to completely eliminate test set leakage, securing robust generalizability.
+5. **Model Explainability (SHAP):** Integration with SHAP provides instance-level transparency, allowing business units to understand the precise features driving an individual's churn risk, enabling highly personalized retention campaigns.
 
 ## Business Automation with Camunda
-A predictive probability is only actionable when integrated into real-world business operations. This project utilizes **Camunda (BPMN & DMN)** to fully automate the decision-making pipeline, ensuring zero-touch operations without manual intervention.
+Predictive probability yields business value only when integrated into operational workflows. This project utilizes **Camunda (BPMN & DMN)** to fully automate the decision-making pipeline, ensuring zero-touch operations.
 
-- **DMN (Decision Model and Notation):** Acts as the business logic engine. It takes the *Churn Probability* (from the AI model) and *Customer Segment* (VIP/Standard) as inputs, then evaluates them against predefined business rules to output a concrete retention action:
-  - `VIP Customer + High Risk (>= 70%)` -> Issue a 30% discount voucher and trigger a direct customer care call.
-  - `Standard Customer + High Risk` -> Send an automated SMS with complimentary 4G data.
-- **BPMN (Business Process Model and Notation):** Orchestrates the end-to-end data flow. It manages the pipeline from retrieving customer data (Start Event), requesting the AI prediction (Service Task), passing data to the DMN engine for evaluation (Business Rule Task), to executing the final retention action such as an Email or SMS (Send Task).
+- **DMN (Decision Model and Notation):** Functions as the business logic engine. It evaluates the AI-generated Churn Probability against predefined business rules to output concrete retention actions. For instance, high-risk profiles may trigger immediate discount vouchers or direct account manager interventions, whereas lower-risk profiles might receive automated SMS engagement.
+- **BPMN (Business Process Model and Notation):** Orchestrates the end-to-end data flow. It manages the pipeline sequence from retrieving customer data, requesting AI prediction inferences, passing the resultant probability to the DMN engine, and ultimately executing the prescribed retention action via external service tasks.
 
 ## Expected Outcomes
-- **Increased Retention Rate:** Ensures customers receive the right intervention at the right time through the appropriate channel.
-- **Cost Optimization:** Strategically allocates promotional budgets (vouchers, data packages) exclusively to high-value customers genuinely at risk of churning.
-- **Zero-touch Operations:** The entire retention pipeline operates autonomously in real-time, significantly reducing the manual workload for the Customer Success team and minimizing response latency.
+- **Increased Retention Rate:** Ensures precise, targeted interventions occur proactively.
+- **Cost Optimization:** Strategically restricts promotional budgets to high-value customers who are demonstrably at risk.
+- **Operational Efficiency:** The entire retention pipeline operates autonomously, significantly reducing manual overhead for Customer Success teams and minimizing intervention latency.
 
 ---
-## Tech Stack & Tools Used
-- **Machine Learning & Data Processing:** `Python`, `scikit-learn`, `XGBoost`, `Pandas`, `NumPy`, `Joblib`
-- **Environment & Modeling:** `Jupyter Notebook`
-- **Business Process Automation:** `Camunda Modeler`, `BPMN 2.0`, `DMN 1.3`
+## Tech Stack & Tools
+- **Machine Learning & Data Processing:** Python, scikit-learn, XGBoost, imbalanced-learn, SHAP, Pandas, NumPy, Joblib
+- **Environment:** Jupyter Notebook
+- **Business Process Automation:** Camunda Modeler, BPMN 2.0, DMN 1.3
 
 ---
 ## Repository Structure
-- `/data`: Contains the raw Telco Customer Churn dataset (CSV).
-- `/notebooks`: Contains the Jupyter Notebook for training the AI model and the exported model artifacts (`.pkl`).
-- `/camunda_models`: Contains the BPMN/DMN design schemas and exported visual diagrams.
-- `main.py`: A simulation script that demonstrates the end-to-end integration flow (AI Inference -> DMN Decision -> Execution).
+- `01_Churn_Prediction.ipynb`: The core analytical notebook encompassing the end-to-end machine learning pipeline from EDA to threshold optimization and SHAP explainability.
+- `churn_model.pkl` / `churn_metadata.pkl`: Serialized model artifacts containing the trained XGBoost algorithm, optimized decision threshold, and feature schema required for production inference.
+- `/camunda_models/`: Directory housing the BPMN and DMN design schemas and visual diagrams.
+- `/data/`: Raw dataset directory.
+- `main.py`: Simulation script demonstrating the integration flow between AI Inference, DMN Decisioning, and Execution.
 
-## How to Run the Simulation
+## Execution Instructions
 1. Install the required dependencies:
    ```bash
-   pip install pandas numpy joblib scikit-learn
+   pip install pandas numpy joblib scikit-learn xgboost imbalanced-learn shap matplotlib seaborn
    ```
-2. Execute the main script:
+2. Execute the inference simulation script:
    ```bash
    python main.py
    ```
-3. Observe the console logs to see the AI analysis and automated DMN decisions in action.
+3. Monitor the console output to observe the sequential AI analysis and automated DMN decisions.
